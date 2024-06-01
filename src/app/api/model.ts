@@ -37,3 +37,21 @@ export const inventoryDeleteProductById = (productId: string) => {
   console.log(inventory);
   return result;
 };
+
+const PRODUCTS_PER_PAGE = 6;
+export const inventoryView = (page = 0, search = "") => {
+  const allProductsMatchingSearch = Array.from(inventory.values()).filter(
+    (p) => p.count > 0 && p.name.includes(search),
+  );
+
+  const indexStart = page * PRODUCTS_PER_PAGE;
+  const indexEnd = indexStart + PRODUCTS_PER_PAGE;
+
+  const products = allProductsMatchingSearch.slice(indexStart, indexEnd);
+
+  return {
+    currentPage: page,
+    products,
+    hasPageNext: indexEnd < allProductsMatchingSearch.length,
+  };
+};
