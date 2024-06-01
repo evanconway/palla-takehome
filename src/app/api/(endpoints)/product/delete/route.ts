@@ -1,4 +1,4 @@
-import { inventoryDeleteProductById } from "../../model";
+import { inventoryDeleteProductById } from "../../../model";
 
 export async function DELETE(req: Request) {
   const { productId } = await req.json();

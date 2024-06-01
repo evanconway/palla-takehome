@@ -1,9 +1,8 @@
-import { v4 as uuid } from "uuid";
 import {
   NewProduct,
   inventoryCreateProduct,
   isValidNewProduct,
-} from "../../model";
+} from "../../../model";
 
 export async function POST(req: Request) {
   const newProduct = (await req.json()) as NewProduct;
