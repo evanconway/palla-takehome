@@ -19,13 +19,13 @@ const generateRandomName = () => {
 };
 
 const seedTheInventory = async () => {
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 30; i++) {
     const res = await fetch("http://localhost:3000/api/product/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: generateRandomName(),
-        imageURL: "",
+        imageURL: (await fetch("https://picsum.photos/200")).url,
         priceInCents: Math.floor(Math.random() * 100000) + 100,
         count: Math.floor(Math.random() * 100) + 1,
         description:
