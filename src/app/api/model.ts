@@ -75,3 +75,16 @@ export const inventoryViewProductById = (id: string) => inventory.get(id);
 // seed for development
 import { seedData } from "./testData";
 seedData.forEach((p) => inventoryCreateProduct(p as NewProduct));
+
+interface Cart {
+  id: string;
+  products: Map<string, Product>;
+}
+
+const carts = new Map<string, Cart>();
+
+export const cartCreate = () => {
+  const newCartId = uuid();
+  carts.set(newCartId, { id: newCartId, products: new Map() });
+  return newCartId;
+};
