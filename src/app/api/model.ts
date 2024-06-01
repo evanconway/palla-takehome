@@ -39,19 +39,33 @@ export const inventoryDeleteProductById = (productId: string) => {
 };
 
 const PRODUCTS_PER_PAGE = 6;
+
+export interface ProductView {
+  firstPage: number;
+  lastPage: number;
+  currentPage: number;
+  products: Product[];
+}
+
 export const inventoryView = (page = 0, search = "") => {
   const allProductsMatchingSearch = Array.from(inventory.values()).filter(
     (p) => p.count > 0 && p.name.includes(search),
   );
 
-  const indexStart = page * PRODUCTS_PER_PAGE;
+  const indexStart = (page < 0 ? 0 : page) * PRODUCTS_PER_PAGE;
   const indexEnd = indexStart + PRODUCTS_PER_PAGE;
 
   const products = allProductsMatchingSearch.slice(indexStart, indexEnd);
 
-  return {
+  const result: ProductView = {
+    firstPage: 0,
+    lastPage: Math.max(
+      0,
+      Math.floor(allProductsMatchingSearch.length / PRODUCTS_PER_PAGE) - 1,
+    ),
     currentPage: page,
     products,
-    hasPageNext: indexEnd < allProductsMatchingSearch.length,
   };
+
+  return result;
 };
