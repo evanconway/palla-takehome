@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { ProductView } from "./api/model";
+import { domain } from "./util";
 
 export default async function Home({
-  params,
   searchParams,
 }: {
-  params: { slug: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const url = new URL(`http://localhost:3000/api/product/view`);
+  const url = new URL(`${domain}/api/product/browse`);
   url.searchParams.set(
     "page",
     searchParams && typeof searchParams["page"] === "string"
@@ -51,6 +50,7 @@ export default async function Home({
               <div>{p.name}</div>
               <img src={p.imageURL}></img>
               <div>${p.priceInCents / 100}</div>
+              <Link href={`${domain}/product?id=${p.id}`}>View Product</Link>
             </li>
           ))}
         </ul>

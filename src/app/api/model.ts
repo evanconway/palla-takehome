@@ -25,16 +25,16 @@ export interface Product extends NewProduct {
 
 const inventory = new Map<string, Product>();
 
+export const inventoryAllValues = () => Array.from(inventory.values());
+
 export const inventoryCreateProduct = (newProduct: NewProduct) => {
   const newId = uuid();
   inventory.set(newId, { id: newId, ...newProduct });
-  console.log(inventory);
   return newId;
 };
 
 export const inventoryDeleteProductById = (productId: string) => {
   const result = inventory.delete(productId);
-  console.log(inventory);
   return result;
 };
 
@@ -69,3 +69,9 @@ export const inventoryView = (page = 0, search = "") => {
 
   return result;
 };
+
+export const inventoryViewProductById = (id: string) => inventory.get(id);
+
+// seed for development
+import { seedData } from "./testData";
+seedData.forEach((p) => inventoryCreateProduct(p as NewProduct));
