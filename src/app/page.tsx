@@ -25,12 +25,14 @@ export default async function Home({
   ).json()) as ProductView;
 
   const pageNavigator = (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row gap-4 my-16">
       <Link href={`/?page=${firstPage}`}>First Page</Link>
       <Link href={`/?page=${Math.max(firstPage, currentPage - 1)}`}>
         Previous Page
       </Link>
-      <div>{currentPage}</div>
+      <div>
+        {currentPage + 1} of {lastPage + 1}
+      </div>
       <Link href={`/?page=${Math.min(lastPage, currentPage + 1)}`}>
         Next Page
       </Link>
@@ -60,7 +62,7 @@ export default async function Home({
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div>Product View</div>
+      <div className="text-xl">Browse Products</div>
       {productDisplay}
     </main>
   );
