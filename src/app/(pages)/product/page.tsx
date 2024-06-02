@@ -3,7 +3,7 @@
 import { Product } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function Page({
   searchParams,
@@ -19,13 +19,15 @@ export default function Page({
 
   const [itemIsInCart, setItemIsInCart] = useState<null | number>(null);
 
-  const fetchItemIsInCart = async () => {
-    const inCartURL = new URL(`${domain}/api/cart/productcount`);
-    inCartURL.searchParams.set("id", productId);
-    const data = await (await fetch(inCartURL)).json();
-    const hasInCart = data["count"] as number;
-    setItemIsInCart(hasInCart);
-  };
+  const fetchItemIsInCart = useMemo(() => {
+    return async () => {
+      const inCartURL = new URL(`${domain}/api/cart/productcount`);
+      inCartURL.searchParams.set("id", productId);
+      const data = await (await fetch(inCartURL)).json();
+      const hasInCart = data["count"] as number;
+      setItemIsInCart(hasInCart);
+    };
+  }, [setItemIsInCart]);
 
   useEffect(() => {
     fetchItemIsInCart();
