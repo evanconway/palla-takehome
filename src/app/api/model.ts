@@ -265,9 +265,15 @@ export const getOrderFunctions = async () => {
     ordersGetByCartId: (cartId: string) => {
       const cartOrders = getCartOrdersById(cartId);
       if (cartOrders === undefined) return [] as Order[];
-      const result = Object.keys(cartOrders).map((orderId) => {
-        return cartOrders[orderId]!;
-      });
+      const result = Object.keys(cartOrders)
+        .map((orderId) => {
+          return cartOrders[orderId]!;
+        })
+        .sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateB.getTime() - dateA.getTime();
+        });
       return result;
     },
   };

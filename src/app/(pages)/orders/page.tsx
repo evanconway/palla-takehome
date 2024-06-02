@@ -15,10 +15,15 @@ export default async function Page() {
         <ul className="mt-8">
           {orders.map((order, i) => {
             const date = new Date(order.date);
-            console.log(date);
+            const hour = date.getHours();
+            const displayHour = hour % 12 || 12;
+            const minute = date.getMinutes();
+            const anteMeridiem = hour >= 13 ? "PM" : "AM";
+
             return (
               <li key={i} className="my-6">
                 <div>{`${date.toDateString()}`}</div>
+                <div>{`${displayHour}:${minute}${anteMeridiem}`}</div>
                 <div>${centsToDollarString(order.amountInCents)}</div>
               </li>
             );
