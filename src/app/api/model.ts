@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { seedData } from "./testData";
+import storage from "node-persist";
 
 export interface NewProduct {
   name: string;
@@ -24,36 +24,6 @@ export interface Product extends NewProduct {
   count: number;
 }
 
-let seedingRequired = false;
-// @ts-ignore
-if (!global.inventory) {
-  // @ts-ignore
-  global.inventory = new Map<string, Product>();
-  seedingRequired = true;
-}
-
-// @ts-ignore
-const inventory = global.inventory as Map<string, Product>;
-
-export const inventoryCreateProduct = (newProduct: NewProduct) => {
-  const newId = uuid();
-  inventory.set(newId, { id: newId, ...newProduct });
-  return newId;
-};
-
-// seed for development
-// if (seedingRequired) {
-//   console.log("----------running seed code----------");
-//   seedData.forEach((p) => console.log(inventoryCreateProduct(p as NewProduct)));
-// }
-
-export const inventoryAllValues = () => Array.from(inventory.values());
-
-export const inventoryDeleteProductById = (productId: string) => {
-  const result = inventory.delete(productId);
-  return result;
-};
-
 const PRODUCTS_PER_PAGE = 6;
 
 export interface ProductView {
@@ -63,30 +33,57 @@ export interface ProductView {
   products: Product[];
 }
 
-export const inventoryView = (page = 0, search = "") => {
-  const allProductsMatchingSearch = Array.from(inventory.values()).filter(
-    (p) => p.count > 0 && p.name.includes(search),
-  );
+export const getInventoryFunctions = async () => {
+  // initialize
+  const k = "inventory";
+  await storage.init();
+  if ((await storage.getItem(k)) === undefined) {
+    console.log("inventory does not exist, creating...");
+    const result = await storage.setItem(k, {});
+    console.log(result);
+  }
 
-  const indexStart = (page < 0 ? 0 : page) * PRODUCTS_PER_PAGE;
-  const indexEnd = indexStart + PRODUCTS_PER_PAGE;
+  const inventory = await storage.getItem(k);
 
-  const products = allProductsMatchingSearch.slice(indexStart, indexEnd);
+  const inventoryAllValues = () =>
+    Object.values(inventory).map((p) => p as Product);
 
-  const result: ProductView = {
-    firstPage: 0,
-    lastPage: Math.max(
-      0,
-      Math.ceil(allProductsMatchingSearch.length / PRODUCTS_PER_PAGE) - 1,
-    ),
-    currentPage: page,
-    products,
+  return {
+    inventoryCreateProduct: (newProduct: NewProduct) => {
+      const newId = uuid();
+      inventory[newId] = { id: newId, ...newProduct } as Product;
+      return newId;
+    },
+    inventoryAllValues,
+    inventoryDeleteProductById: (productId: string) => {
+      const result = inventory[productId];
+      delete inventory.productId;
+      return result;
+    },
+    inventoryView: (page = 0, search = "") => {
+      const allProductsMatchingSearch = inventoryAllValues().filter(
+        (p) => p.count > 0 && p.name.includes(search),
+      );
+      const indexStart = (page < 0 ? 0 : page) * PRODUCTS_PER_PAGE;
+      const indexEnd = indexStart + PRODUCTS_PER_PAGE;
+      const products = allProductsMatchingSearch.slice(indexStart, indexEnd);
+      const result: ProductView = {
+        firstPage: 0,
+        lastPage: Math.max(
+          0,
+          Math.ceil(allProductsMatchingSearch.length / PRODUCTS_PER_PAGE) - 1,
+        ),
+        currentPage: page,
+        products,
+      };
+      return result;
+    },
+    inventoryViewProductById: (id: string) => {
+      const result = inventory[id];
+      return result === undefined ? undefined : (result as Product);
+    },
   };
-
-  return result;
 };
-
-export const inventoryViewProductById = (id: string) => inventory.get(id);
 
 interface Cart {
   id: string;
@@ -117,24 +114,31 @@ if (!global.userCartId) {
 // @ts-ignore
 export const USER_CART_ID = global.userCartId as string;
 
-export const cartProductGetCount = (cartId: string, productId: string) => {
+export const cartProductGetCount = async (
+  cartId: string,
+  productId: string,
+) => {
+  const inv = await getInventoryFunctions();
+
   const cart = carts.get(cartId);
   if (cart === undefined) return -1;
-  if (!inventory.has(productId)) return -1; // product does not exist
+  if (inv.inventoryViewProductById(productId) === undefined) return -1; // product does not exist
   const count = cart.products.get(productId);
   return count === undefined ? 0 : count;
 };
 
-export const cartProductAdd = (
+export const cartProductAdd = async (
   cartId: string,
   productId: string,
   count: number,
 ) => {
+  const inv = await getInventoryFunctions();
+
   const cart = carts.get(cartId);
   if (cart === undefined) return -1;
-  const productInventoryCount = inventory.get(productId)?.count;
+  const productInventoryCount = inv.inventoryViewProductById(productId)?.count;
   if (productInventoryCount === undefined) return -1;
-  const alreadyInCart = cartProductGetCount(cartId, productId);
+  const alreadyInCart = await cartProductGetCount(cartId, productId);
   if (alreadyInCart < 0) return -1;
   const newCount = alreadyInCart + count;
   cart.products.set(productId, newCount);
@@ -150,12 +154,13 @@ export const cartProductRemove = (cartId: string, productId: string) => {
   return true;
 };
 
-export const cartGetTotal = (cartId: string) => {
+export const cartGetTotal = async (cartId: string) => {
+  const inv = await getInventoryFunctions();
   const cart = carts.get(cartId);
   if (cart === undefined) return 0;
   return Array.from(cart.products.keys())
     .map((productId) => {
-      const product = inventoryViewProductById(productId)!;
+      const product = inv.inventoryViewProductById(productId)!;
       const count = cart.products.get(productId)!;
       return count * product.priceInCents;
     })
@@ -178,16 +183,17 @@ if (!global.orders) {
 // @ts-ignore
 const orders = global.orders as Map<string, Map<string, Order>>;
 
-export const orderCreateFromCart = (cartId: string) => {
+export const orderCreateFromCart = async (cartId: string) => {
+  const inv = await getInventoryFunctions();
   const cart = carts.get(cartId);
   if (cart === undefined) return false;
   if (cart.products.size <= 0) return false;
-  const orderTotal = cartGetTotal(cartId);
+  const orderTotal = await cartGetTotal(cartId);
   const orderId = uuid();
 
   // remove stock from inventory
   cart.products.forEach((count, productId) => {
-    const product = inventory.get(productId);
+    const product = inv.inventoryViewProductById(productId);
     if (product === undefined) return;
     product.count -= count;
   });
