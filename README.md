@@ -1,6 +1,7 @@
 # Palla Takehome Interview
 
 Instructions from team:
+
 create a simple e-commerce web app that enables customers to browse available products, add them to their cart, see the total price, and "checkout", i.e. finalize their cart.
 
 please create an API that powers this experience. additionally, the API should allow for new products to be added to the site's inventory.
