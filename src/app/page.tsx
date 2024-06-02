@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProductView } from "./api/model";
+import { ProductView } from "@/app/(pages)/clientUtil";
 import { domain } from "./util";
 
 export default async function Home({

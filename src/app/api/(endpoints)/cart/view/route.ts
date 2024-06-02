@@ -4,7 +4,7 @@ import {
   USER_CART_ID,
 } from "@/app/api/model";
 
-export interface CartView {
+interface CartView {
   products: {
     id: string;
     name: string;

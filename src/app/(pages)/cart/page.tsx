@@ -1,26 +1,15 @@
 "use client";
 
-import { CartView } from "@/app/api/(endpoints)/cart/view/route";
-import { USER_CART_ID } from "@/app/api/model";
+import { CartView } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function Page({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
-  const cartId =
-    searchParams && typeof searchParams["id"] === "string"
-      ? searchParams["id"]
-      : "";
-
+export default function Page() {
   const [cartView, setCartView] = useState<CartView | null>(null);
 
   const fetchCart = async () => {
-    const cartURL = new URL(`${domain}/api/cart/view?=${cartId}`);
-    cartURL.searchParams.set("id", USER_CART_ID);
+    const cartURL = new URL(`${domain}/api/cart/view`);
     const data = await (await fetch(cartURL)).json();
     setCartView(data as CartView);
   };
@@ -62,6 +51,11 @@ export default function Page({
             ))}
           </ul>
           <div className="text-xl">TOTAL: ${cartView.totalInCents / 100}</div>
+          {cartView.products.length <= 0 ? null : (
+            <Link className="text-xl" href={`${domain}/checkout`}>
+              Checkout
+            </Link>
+          )}
         </div>
       )}
       <Link href={`${domain}`}>Browse Products</Link>

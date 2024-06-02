@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/app/api/model";
+import { Product } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
 import { useEffect, useState } from "react";
