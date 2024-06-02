@@ -4,6 +4,7 @@ import {
   inventoryViewProductById,
   USER_CART_ID,
 } from "@/app/api/model";
+import { storageGetFuncs } from "@/app/api/testNodePersist";
 
 interface CartView {
   products: {
@@ -18,6 +19,10 @@ interface CartView {
 }
 
 export async function GET(req: Request) {
+  const s = await storageGetFuncs();
+  await s.incrementCounter();
+  console.log(await s.getCounter());
+
   const cartId = USER_CART_ID; // would bein a cookie or something in serious version
   const cart = cartView(cartId);
   const result: CartView = { products: [], totalInCents: 0 };
