@@ -12,20 +12,20 @@ please use github or similar to host the repo, and please make the project easy 
 
 ## Running The App
 
-To run this app, clone the repo to your machine. Make sure you have the latest version of Node installed. Navigate to the cloned directory and run:
+Clone the repo to your machine. Make sure you have the latest version of Node installed. Make sure you have no other applications running on port 3000. Navigate to the cloned directory and run:
 
 `npm i`
 `npm run dev`
 
-You should now see a plain Browse Products page with no products. To seed with test data run:
+Open a browser and go to `http:localhost:3000` You should now see a plain Browse Products page with no products. To seed with test data run:
 
 `npm run seed`
 
-Refresh the page and you should now see a paginated list of imaginary products. You made view these products, add them to your cart, and checkout to create orders totalling the sum of all items in your cart.
+Refresh the page and you should now see a paginated list of imaginary products. You may view these products, add them to your cart, and checkout to create orders totalling the sum of all items in your cart.
 
 ## Add Product Endpoint
 
-You may also add products to the list. The endpoint is `<app domain>/api/product/create`. The request should use the post method and the body contents should contain the following fields:
+You may also add products to the list. The endpoint is `/api/product/create`. The request should use the post method and the body contents should contain the following fields:
 
 | name         | type    |
 | ------------ | ------- |
