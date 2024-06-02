@@ -43,7 +43,7 @@ export const getInventoryFunctions = async () => {
     console.log(result);
   }
 
-  const inventory = await storage.getItem(k);
+  const inventory = (await storage.getItem(k)) as Record<string, Product>;
 
   const inventoryAllValues = () =>
     Object.values(inventory).map((p) => p as Product);
@@ -100,12 +100,12 @@ export const getCartFunctions = async () => {
     console.log(result);
   }
 
-  const carts = await storage.getItem(k);
+  const carts = (await storage.getItem(k)) as Record<string, Cart>;
 
   const getCartById = (cartId: string) => {
     const result = carts[cartId];
     if (result === undefined) return undefined;
-    return result as Cart;
+    return result;
   };
 
   const cartProductGetCount = async (cartId: string, productId: string) => {
@@ -120,7 +120,7 @@ export const getCartFunctions = async () => {
 
   const cartCreate = () => {
     const newCartId = uuid();
-    carts[newCartId] = { id: newCartId, products: {} } as Cart;
+    carts[newCartId] = { id: newCartId, products: {} };
     return newCartId;
   };
 
@@ -180,61 +180,74 @@ export interface Order {
   cartId: string;
   id: string;
   amountInCents: number;
-  date: Date;
+  date: string; // need to use for storing as JSON, use ISO 8601 format
 }
 
-// @ts-ignore
-if (!global.orders) {
-  // @ts-ignore
-  global.orders = new Map<string, Map<string, Order>>(); // mapping of cartIds to map of Orders
-}
-
-// @ts-ignore
-const orders = global.orders as Map<string, Map<string, Order>>;
-
-export const orderCreateFromCart = async (cartId: string) => {
-  const inv = await getInventoryFunctions();
-  const carts = await getCartFunctions();
-  const cart = carts.getCartById(cartId);
-  if (cart === undefined) return false;
-  if (cart.products.size <= 0) return false;
-  const orderTotal = await carts.cartGetTotal(cartId);
-  const orderId = uuid();
-
-  // remove stock from inventory
-  Object.keys(cart.products).forEach((productId) => {
-    const product = inv.inventoryViewProductById(productId);
-    if (product === undefined) return;
-    const count = cart.products[productId];
-    product.count -= count;
-  });
-
-  // clear cart
-  cart.products = {};
-
-  // create orderMap for cart if not exists
-  if (!orders.has(cartId)) {
-    orders.set(cartId, new Map<string, Order>());
+export const getOrderFunctions = async () => {
+  // initialize
+  const k = "orders";
+  await storage.init();
+  if ((await storage.getItem(k)) === undefined) {
+    console.log("orders does not exist, creating...");
+    // mapping of cartIds to map of Orders
+    const result = await storage.setItem(k, {}); // originally Map<string, Map<string, Order>>
+    console.log(result);
   }
 
-  const cartOrders = orders.get(cartId)!;
-  const order: Order = {
-    cartId,
-    id: orderId,
-    amountInCents: orderTotal,
-    date: new Date(),
+  // mapping of cartIds to map of Orders
+  const orders = (await storage.getItem(k)) as Record<
+    string,
+    Record<string, Order>
+  >;
+
+  const getCartById = (cartId: string) => {
+    const result = orders[cartId];
+    if (result === undefined) return undefined;
+    return result;
   };
 
-  cartOrders.set(order.id, order);
+  return {
+    orderCreateFromCart: async (cartId: string) => {
+      const inv = await getInventoryFunctions();
+      const carts = await getCartFunctions();
+      const cart = carts.getCartById(cartId);
+      if (cart === undefined) return false;
+      if (cart.products.size <= 0) return false;
+      const orderTotal = await carts.cartGetTotal(cartId);
+      const orderId = uuid();
 
-  return true;
-};
+      // remove stock from inventory
+      Object.keys(cart.products).forEach((productId) => {
+        const product = inv.inventoryViewProductById(productId);
+        if (product === undefined) return;
+        const count = cart.products[productId];
+        product.count -= count;
+      });
 
-export const ordersGetByCartId = (cartId: string) => {
-  const cartOrders = orders.get(cartId);
-  if (cartOrders === undefined) return [] as Order[];
-  const result = Array.from(cartOrders.keys()).map((orderId) => {
-    return cartOrders.get(orderId)!;
-  });
-  return result;
+      // clear cart
+      cart.products = {};
+
+      // create orderMap for cart if not exists
+      if (getCartById(cartId) === undefined) {
+        orders[cartId] = {};
+      }
+      const cartOrders = getCartById(cartId)!;
+      const order: Order = {
+        cartId,
+        id: orderId,
+        amountInCents: orderTotal,
+        date: new Date().toISOString(),
+      };
+      cartOrders[order.id] = order;
+      return true;
+    },
+    ordersGetByCartId: (cartId: string) => {
+      const cartOrders = getCartById(cartId);
+      if (cartOrders === undefined) return [] as Order[];
+      const result = Object.keys(cartOrders).map((orderId) => {
+        return cartOrders[orderId]!;
+      });
+      return result;
+    },
+  };
 };

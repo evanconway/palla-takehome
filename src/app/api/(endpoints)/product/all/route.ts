@@ -1,5 +1,6 @@
-import { inventoryAllValues } from "@/app/api/model";
+import { getInventoryFunctions } from "@/app/api/model";
 
 export async function GET(req: Request) {
-  return Response.json(inventoryAllValues());
+  const inv = await getInventoryFunctions();
+  return Response.json(await inv.inventoryAllValues());
 }
