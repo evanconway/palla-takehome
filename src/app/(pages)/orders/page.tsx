@@ -12,12 +12,18 @@ export default async function Page() {
       {orders.length <= 0 ? (
         <div>no orders</div>
       ) : (
-        orders.map((order, i) => (
-          <li key={i}>
-            <div>{order.date.toISOString()}</div>
-            <div>${centsToDollarString(order.amountInCents)}</div>
-          </li>
-        ))
+        <ul className="mt-8">
+          {orders.map((order, i) => {
+            const date = new Date(order.date);
+            console.log(date);
+            return (
+              <li key={i} className="my-6">
+                <div>{`${date.toDateString()}`}</div>
+                <div>${centsToDollarString(order.amountInCents)}</div>
+              </li>
+            );
+          })}
+        </ul>
       )}
       <Link href={`${domain}`}>Browse Products</Link>
     </main>

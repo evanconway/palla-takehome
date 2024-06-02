@@ -32,5 +32,5 @@ export interface Order {
   cartId: string;
   id: string;
   amountInCents: number;
-  date: Date;
+  date: string; // Date objects come through as strings after json.stringify();
 }

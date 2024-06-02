@@ -20,7 +20,6 @@ export default function Page() {
   }, [fetchCart]);
 
   if (cartView === null) return <div>loading...</div>;
-
   if (cartView.products.length <= 0) redirect(`${domain}`);
 
   return (
@@ -30,8 +29,11 @@ export default function Page() {
         <div className="text-xl">TOTAL: ${cartView.totalInCents / 100}</div>
         <div>
           <button
-            onClick={() => {
-              console.log("purchased!");
+            onClick={async () => {
+              await fetch(`${domain}/api/orders/create`, {
+                method: "POST",
+              });
+              redirect(`${domain}/orders`);
             }}
           >
             Finalize Purchase
