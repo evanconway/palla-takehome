@@ -55,6 +55,13 @@ export const getInventoryFunctions = async () => {
       await storage.setItem(k, inventory);
       return newId;
     },
+    setProductStock: async (productId: string, newStock: number) => {
+      if (newStock < 0) return false;
+      const product = inventory[productId];
+      if (product === undefined) return false;
+      product.count = newStock;
+      await storage.setItem(k, inventory);
+    },
     inventoryAllValues,
     inventoryDeleteProductById: async (productId: string) => {
       const result = inventory[productId];
@@ -139,6 +146,12 @@ export const getCartFunctions = async () => {
     getCartById,
     cartCreate,
     cartProductGetCount,
+    clear: async (cartId: string) => {
+      const cart = carts[cartId];
+      if (cart === undefined) return;
+      cart.products = {};
+      await storage.setItem(k, carts);
+    },
     cartProductAdd: async (
       cartId: string,
       productId: string,
@@ -205,7 +218,7 @@ export const getOrderFunctions = async () => {
     Record<string, Order>
   >;
 
-  const getCartById = (cartId: string) => {
+  const getCartOrdersById = (cartId: string) => {
     const result = orders[cartId];
     if (result === undefined) return undefined;
     return result;
@@ -222,21 +235,23 @@ export const getOrderFunctions = async () => {
       const orderId = uuid();
 
       // remove stock from inventory
-      Object.keys(cart.products).forEach((productId) => {
+      const productIds = Object.keys(cart.products);
+      for (const productId of productIds) {
         const product = inv.inventoryViewProductById(productId);
-        if (product === undefined) return;
-        const count = cart.products[productId];
-        product.count -= count;
-      });
+        if (product !== undefined) {
+          const count = cart.products[productId];
+          await inv.setProductStock(productId, product.count - count);
+        }
+      }
 
       // clear cart
-      cart.products = {};
+      carts.clear(cartId);
 
       // create orderMap for cart if not exists
-      if (getCartById(cartId) === undefined) {
+      if (getCartOrdersById(cartId) === undefined) {
         orders[cartId] = {};
       }
-      const cartOrders = getCartById(cartId)!;
+      const cartOrders = getCartOrdersById(cartId)!;
       const order: Order = {
         cartId,
         id: orderId,
@@ -244,10 +259,11 @@ export const getOrderFunctions = async () => {
         date: new Date().toISOString(),
       };
       cartOrders[order.id] = order;
+      await storage.setItem(k, orders);
       return true;
     },
     ordersGetByCartId: (cartId: string) => {
-      const cartOrders = getCartById(cartId);
+      const cartOrders = getCartOrdersById(cartId);
       if (cartOrders === undefined) return [] as Order[];
       const result = Object.keys(cartOrders).map((orderId) => {
         return cartOrders[orderId]!;
