@@ -3,16 +3,18 @@
 import { CartView } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function Page() {
   const [cartView, setCartView] = useState<CartView | null>(null);
 
-  const fetchCart = async () => {
-    const cartURL = new URL(`${domain}/api/cart/view`);
-    const data = await (await fetch(cartURL)).json();
-    setCartView(data as CartView);
-  };
+  const fetchCart = useMemo(() => {
+    return async () => {
+      const cartURL = new URL(`${domain}/api/cart/view`);
+      const data = await (await fetch(cartURL)).json();
+      setCartView(data as CartView);
+    };
+  }, [setCartView]);
 
   useEffect(() => {
     fetchCart();

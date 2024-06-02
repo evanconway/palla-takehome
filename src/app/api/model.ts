@@ -77,7 +77,7 @@ export const inventoryView = (page = 0, search = "") => {
     firstPage: 0,
     lastPage: Math.max(
       0,
-      Math.floor(allProductsMatchingSearch.length / PRODUCTS_PER_PAGE) - 1,
+      Math.ceil(allProductsMatchingSearch.length / PRODUCTS_PER_PAGE) - 1,
     ),
     currentPage: page,
     products,
