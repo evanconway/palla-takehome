@@ -1,4 +1,5 @@
 import { v4 as uuid } from "uuid";
+import { seedData } from "./testData";
 
 export interface NewProduct {
   name: string;
@@ -23,15 +24,30 @@ export interface Product extends NewProduct {
   count: number;
 }
 
-const inventory = new Map<string, Product>();
+let seedingRequired = false;
+// @ts-ignore
+if (!global.inventory) {
+  // @ts-ignore
+  global.inventory = new Map<string, Product>();
+  seedingRequired = true;
+}
 
-export const inventoryAllValues = () => Array.from(inventory.values());
+// @ts-ignore
+const inventory = global.inventory as Map<string, Product>;
 
 export const inventoryCreateProduct = (newProduct: NewProduct) => {
   const newId = uuid();
   inventory.set(newId, { id: newId, ...newProduct });
   return newId;
 };
+
+// seed for development
+if (seedingRequired) {
+  console.log("----------running seed code----------");
+  seedData.forEach((p) => console.log(inventoryCreateProduct(p as NewProduct)));
+}
+
+export const inventoryAllValues = () => Array.from(inventory.values());
 
 export const inventoryDeleteProductById = (productId: string) => {
   const result = inventory.delete(productId);
@@ -72,20 +88,19 @@ export const inventoryView = (page = 0, search = "") => {
 
 export const inventoryViewProductById = (id: string) => inventory.get(id);
 
-// seed for development
-import { seedData } from "./testData";
-console.log("----------running seed code----------");
-seedData.forEach((p) => inventoryCreateProduct(p as NewProduct));
-import { getDB } from "@/db";
-const getDBTime = getDB().getDBTime;
-console.log("DB time: ", getDBTime());
-
 interface Cart {
   id: string;
   products: Map<string, number>; // mapping of product IDs to count
 }
 
-const carts = new Map<string, Cart>();
+// @ts-ignore
+if (!global.carts) {
+  // @ts-ignore
+  global.carts = new Map<string, Product>();
+}
+
+// @ts-ignore
+const carts = global.carts as Map<string, Cart>;
 
 const cartCreate = () => {
   const newCartId = uuid();
@@ -93,7 +108,14 @@ const cartCreate = () => {
   return newCartId;
 };
 
-export const USER_CART_ID = cartCreate();
+// @ts-ignore
+if (!global.userCartId) {
+  // @ts-ignore
+  global.userCartId = cartCreate();
+}
+
+// @ts-ignore
+export const USER_CART_ID = global.userCartId as string;
 
 export const cartProductGetCount = (cartId: string, productId: string) => {
   const cart = carts.get(cartId);

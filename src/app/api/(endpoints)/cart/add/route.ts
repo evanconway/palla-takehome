@@ -9,6 +9,5 @@ export async function POST(req: NextRequest) {
     count: number;
   };
   const newCount = cartProductAdd(cartId, productId, count);
-  console.log({ cartId, productId, count });
   return Response.json({ productId, newCount });
 }
