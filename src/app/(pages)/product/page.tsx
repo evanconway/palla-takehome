@@ -50,7 +50,20 @@ export default function Page({
       <div>{product.count} left in stock</div>
       <br />
       <div className="flex gap-4">
-        <button>Add To Cart</button>
+        <button
+          onClick={async () => {
+            const newCount = await fetch(`${domain}/api/cart/add`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                productId: product.id,
+                count: amountToPurchase,
+              }),
+            });
+          }}
+        >
+          Add To Cart
+        </button>
         <input
           className="text-black"
           type="number"

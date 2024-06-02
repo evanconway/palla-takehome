@@ -74,17 +74,47 @@ export const inventoryViewProductById = (id: string) => inventory.get(id);
 
 // seed for development
 import { seedData } from "./testData";
+console.log("----------running seed code----------");
 seedData.forEach((p) => inventoryCreateProduct(p as NewProduct));
+import { getDB } from "@/db";
+const getDBTime = getDB().getDBTime;
+console.log("DB time: ", getDBTime());
 
 interface Cart {
   id: string;
-  products: Map<string, Product>;
+  products: Map<string, number>; // mapping of product IDs to count
 }
 
 const carts = new Map<string, Cart>();
 
-export const cartCreate = () => {
+const cartCreate = () => {
   const newCartId = uuid();
   carts.set(newCartId, { id: newCartId, products: new Map() });
   return newCartId;
+};
+
+export const USER_CART_ID = cartCreate();
+
+export const cartProductGetCount = (cartId: string, productId: string) => {
+  const cart = carts.get(cartId);
+  if (cart === undefined) return -1;
+  if (!inventory.has(productId)) return -1; // product does not exist
+  const count = cart.products.get(productId);
+  return count === undefined ? 0 : count;
+};
+
+export const cartProductAdd = (
+  cartId: string,
+  productId: string,
+  count: number,
+) => {
+  const cart = carts.get(cartId);
+  if (cart === undefined) return -1;
+  const productInventoryCount = inventory.get(productId)?.count;
+  if (productInventoryCount === undefined) return -1;
+  const alreadyInCart = cartProductGetCount(cartId, productId);
+  if (alreadyInCart < 0) return -1;
+  const newCount = alreadyInCart + count;
+  cart.products.set(productId, newCount);
+  return newCount;
 };
