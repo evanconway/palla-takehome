@@ -96,7 +96,7 @@ interface Cart {
 // @ts-ignore
 if (!global.carts) {
   // @ts-ignore
-  global.carts = new Map<string, Product>();
+  global.carts = new Map<string, Cart>();
 }
 
 // @ts-ignore
