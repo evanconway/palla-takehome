@@ -1,4 +1,5 @@
 import {
+  cartGetTotal,
   cartView,
   inventoryViewProductById,
   USER_CART_ID,
@@ -33,12 +34,6 @@ export async function GET(req: Request) {
       count: cart.products.get(productId)!,
     };
   });
-  result.totalInCents = Array.from(cart.products.keys())
-    .map((productId) => {
-      const product = inventoryViewProductById(productId)!;
-      const count = cart.products.get(productId)!;
-      return count * product.priceInCents;
-    })
-    .reduce((prev, curr) => prev + curr, 0);
+  result.totalInCents = cartGetTotal(cartId);
   return Response.json(result);
 }

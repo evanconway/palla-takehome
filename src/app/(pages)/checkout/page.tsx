@@ -3,6 +3,7 @@
 import { CartView } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
@@ -20,17 +21,26 @@ export default function Page() {
 
   if (cartView === null) return <div>loading...</div>;
 
+  if (cartView.products.length <= 0) redirect(`${domain}`);
+
   return (
     <main className="p-4">
-      {cartView === null ? (
-        <div>loading...</div>
-      ) : (
+      <div className="flex flex-col gap-8">
+        <h1 className="text-xl">Checkout</h1>
+        <div className="text-xl">TOTAL: ${cartView.totalInCents / 100}</div>
         <div>
-          <h1 className="text-xl">Checkout</h1>
-          <div className="text-xl">TOTAL: ${cartView.totalInCents / 100}</div>
+          <button
+            onClick={() => {
+              console.log("purchased!");
+            }}
+          >
+            Finalize Purchase
+          </button>
         </div>
-      )}
-      <Link href={`${domain}`}>Browse Products</Link>
+        <div>
+          <Link href={`${domain}`}>No, go back to Browse Products</Link>
+        </div>
+      </div>
     </main>
   );
 }

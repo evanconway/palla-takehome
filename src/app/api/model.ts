@@ -149,3 +149,75 @@ export const cartProductRemove = (cartId: string, productId: string) => {
   cart.products.delete(productId);
   return true;
 };
+
+export const cartGetTotal = (cartId: string) => {
+  const cart = carts.get(cartId);
+  if (cart === undefined) return 0;
+  return Array.from(cart.products.keys())
+    .map((productId) => {
+      const product = inventoryViewProductById(productId)!;
+      const count = cart.products.get(productId)!;
+      return count * product.priceInCents;
+    })
+    .reduce((prev, curr) => prev + curr, 0);
+};
+
+export interface Order {
+  cartId: string;
+  id: string;
+  amountInCents: number;
+  date: Date;
+}
+
+// @ts-ignore
+if (!global.orders) {
+  // @ts-ignore
+  global.orders = new Map<string, Map<string, Order>>(); // mapping of cartIds to map of Orders
+}
+
+// @ts-ignore
+const orders = global.orders as Map<string, Map<string, Order>>;
+
+export const orderCreateFromCart = (cartId: string) => {
+  const cart = carts.get(cartId);
+  if (cart === undefined) return false;
+  if (cart.products.size <= 0) return false;
+  const orderTotal = cartGetTotal(cartId);
+  const orderId = uuid();
+
+  // remove stock from inventory
+  cart.products.forEach((count, productId) => {
+    const product = inventory.get(productId);
+    if (product === undefined) return;
+    product.count -= count;
+  });
+
+  // clear cart
+  cart.products.clear();
+
+  // create orderMap for cart if not exists
+  if (!orders.has(cartId)) {
+    orders.set(cartId, new Map<string, Order>());
+  }
+
+  const cartOrders = orders.get(cartId)!;
+  const order: Order = {
+    cartId,
+    id: orderId,
+    amountInCents: orderTotal,
+    date: new Date(),
+  };
+
+  cartOrders.set(order.id, order);
+
+  return true;
+};
+
+export const ordersGetByCartId = (cartId: string) => {
+  const cartOrders = orders.get(cartId);
+  if (cartOrders === undefined) return [] as Order[];
+  const result = Array.from(cartOrders.keys()).map((orderId) => {
+    return cartOrders.get(orderId)!;
+  });
+  return result;
+};

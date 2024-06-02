@@ -61,9 +61,10 @@ export default async function Home({
     );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center justify-between p-24 gap-3">
       <div className="text-xl">Browse Products</div>
       <Link href={`${domain}/cart`}>View Cart</Link>
+      <Link href={`${domain}/orders`}>View Orders</Link>
       {productDisplay}
     </main>
   );

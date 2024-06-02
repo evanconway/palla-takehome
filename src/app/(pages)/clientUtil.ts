@@ -1,3 +1,5 @@
+export const centsToDollarString = (cents: number) => (cents / 100).toFixed(2);
+
 export interface CartView {
   products: {
     id: string;
@@ -24,4 +26,11 @@ export interface ProductView {
   lastPage: number;
   currentPage: number;
   products: Product[];
+}
+
+export interface Order {
+  cartId: string;
+  id: string;
+  amountInCents: number;
+  date: Date;
 }
