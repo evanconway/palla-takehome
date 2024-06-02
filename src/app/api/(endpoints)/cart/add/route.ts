@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { USER_CART_ID, cartProductAdd } from "@/app/api/model";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest) {
   const cartId = USER_CART_ID;
@@ -9,5 +10,6 @@ export async function POST(req: NextRequest) {
     count: number;
   };
   const newCount = cartProductAdd(cartId, productId, count);
+  revalidatePath("/", "layout");
   return Response.json({ productId, newCount });
 }

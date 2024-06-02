@@ -42,10 +42,10 @@ export const inventoryCreateProduct = (newProduct: NewProduct) => {
 };
 
 // seed for development
-if (seedingRequired) {
-  console.log("----------running seed code----------");
-  seedData.forEach((p) => console.log(inventoryCreateProduct(p as NewProduct)));
-}
+// if (seedingRequired) {
+//   console.log("----------running seed code----------");
+//   seedData.forEach((p) => console.log(inventoryCreateProduct(p as NewProduct)));
+// }
 
 export const inventoryAllValues = () => Array.from(inventory.values());
 
