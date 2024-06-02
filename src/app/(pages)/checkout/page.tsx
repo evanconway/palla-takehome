@@ -3,10 +3,12 @@
 import { CartView } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  const router = useRouter();
+
   const [cartView, setCartView] = useState<CartView | null>(null);
 
   const fetchCart = async () => {
@@ -33,7 +35,7 @@ export default function Page() {
               await fetch(`${domain}/api/orders/create`, {
                 method: "POST",
               });
-              redirect(`${domain}/orders`);
+              router.push(`${domain}/orders`);
             }}
           >
             Finalize Purchase
