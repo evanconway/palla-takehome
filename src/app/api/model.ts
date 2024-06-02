@@ -120,16 +120,17 @@ export const getCartFunctions = async () => {
     return count === undefined ? 0 : count;
   };
 
-  const cartCreate = () => {
+  const cartCreate = async () => {
     const newCartId = uuid();
     carts[newCartId] = { id: newCartId, products: {} };
+    await storage.setItem(k, carts);
     return newCartId;
   };
 
   const userCartId = "userCartId";
   if ((await storage.getItem(userCartId)) === undefined) {
     console.log("user cart id does not exist, creating user cart");
-    const result = await storage.setItem(userCartId, cartCreate());
+    const result = await storage.setItem(userCartId, await cartCreate());
     console.log(result);
   }
 
@@ -154,13 +155,15 @@ export const getCartFunctions = async () => {
       if (alreadyInCart < 0) return -1;
       const newCount = alreadyInCart + count;
       cart.products[productId] = newCount;
+      await storage.setItem(k, carts);
       return newCount;
     },
     cartView: (cartId: string) => getCartById(cartId),
-    cartProductRemove: (cartId: string, productId: string) => {
+    cartProductRemove: async (cartId: string, productId: string) => {
       const cart = getCartById(cartId);
       if (cart === undefined) return false;
       delete cart.products[productId];
+      await storage.setItem(k, carts);
       return true;
     },
     cartGetTotal: async (cartId: string) => {

@@ -5,9 +5,7 @@ export async function GET(req: Request) {
   const params = new URL(req.url).searchParams;
   const paramProductId = params.get("id");
   const productId = paramProductId === null ? "" : paramProductId;
-  const result = carts.cartProductGetCount(
-    await carts.GET_USER_CART_ID(),
-    productId,
-  );
+  const cartId = await carts.GET_USER_CART_ID();
+  const result = await carts.cartProductGetCount(cartId, productId);
   return Response.json({ count: result });
 }
