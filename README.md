@@ -1,12 +1,12 @@
 # Palla Takehome Interview
 
-\*create a simple e-commerce web app that enables customers to browse available products, add them to their cart, see the total price, and "checkout", i.e. finalize their cart.
+create a simple e-commerce web app that enables customers to browse available products, add them to their cart, see the total price, and "checkout", i.e. finalize their cart.
 
 please create an API that powers this experience. additionally, the API should allow for new products to be added to the site's inventory.
 
 we use nextjs <14 atm with xstate for handling state but as far as stack, feel free to use what is most comfortable for you -- and skip the database / 3rd party solutions and just store everything in memory...no need for authentication, styling or anything else not central to functionality.
 
-please use github or similar to host the repo, and please make the project easy for me to run on my machine. dont worry about hosting or deploying.\*
+please use github or similar to host the repo, and please make the project easy for me to run on my machine. dont worry about hosting or deploying.
 
 ## Running The App
 
