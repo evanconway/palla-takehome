@@ -140,3 +140,12 @@ export const cartProductAdd = (
   cart.products.set(productId, newCount);
   return newCount;
 };
+
+export const cartView = (cartId: string) => carts.get(cartId);
+
+export const cartProductRemove = (cartId: string, productId: string) => {
+  const cart = carts.get(cartId);
+  if (cart === undefined) return false;
+  cart.products.delete(productId);
+  return true;
+};
