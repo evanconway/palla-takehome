@@ -57,7 +57,7 @@ export const getInventoryFunctions = async () => {
     inventoryAllValues,
     inventoryDeleteProductById: (productId: string) => {
       const result = inventory[productId];
-      delete inventory.productId;
+      delete inventory[productId];
       return result;
     },
     inventoryView: (page = 0, search = "") => {
@@ -87,84 +87,93 @@ export const getInventoryFunctions = async () => {
 
 interface Cart {
   id: string;
-  products: Map<string, number>; // mapping of product IDs to count
+  products: Record<string, number>; // mapping of product IDs to count
 }
 
-// @ts-ignore
-if (!global.carts) {
-  // @ts-ignore
-  global.carts = new Map<string, Cart>();
-}
+export const getCartFunctions = async () => {
+  // initialize
+  const k = "carts";
+  await storage.init();
+  if ((await storage.getItem(k)) === undefined) {
+    console.log("carts does not exist, creating...");
+    const result = await storage.setItem(k, {}); // originally Map<string, Cart>
+    console.log(result);
+  }
 
-// @ts-ignore
-const carts = global.carts as Map<string, Cart>;
+  const carts = await storage.getItem(k);
 
-const cartCreate = () => {
-  const newCartId = uuid();
-  carts.set(newCartId, { id: newCartId, products: new Map() });
-  return newCartId;
-};
+  const getCartById = (cartId: string) => {
+    const result = carts[cartId];
+    if (result === undefined) return undefined;
+    return result as Cart;
+  };
 
-// @ts-ignore
-if (!global.userCartId) {
-  // @ts-ignore
-  global.userCartId = cartCreate();
-}
+  const cartProductGetCount = async (cartId: string, productId: string) => {
+    const inv = await getInventoryFunctions();
 
-// @ts-ignore
-export const USER_CART_ID = global.userCartId as string;
+    const cart = getCartById(cartId);
+    if (cart === undefined) return -1;
+    if (inv.inventoryViewProductById(productId) === undefined) return -1; // product does not exist
+    const count = cart.products[productId];
+    return count === undefined ? 0 : count;
+  };
 
-export const cartProductGetCount = async (
-  cartId: string,
-  productId: string,
-) => {
-  const inv = await getInventoryFunctions();
+  const cartCreate = () => {
+    const newCartId = uuid();
+    carts[newCartId] = { id: newCartId, products: {} } as Cart;
+    return newCartId;
+  };
 
-  const cart = carts.get(cartId);
-  if (cart === undefined) return -1;
-  if (inv.inventoryViewProductById(productId) === undefined) return -1; // product does not exist
-  const count = cart.products.get(productId);
-  return count === undefined ? 0 : count;
-};
+  const userCartId = "userCartId";
+  if ((await storage.getItem(userCartId)) === undefined) {
+    console.log("user cart id does not exist, creating user cart");
+    const result = await storage.setItem(userCartId, cartCreate());
+    console.log(result);
+  }
 
-export const cartProductAdd = async (
-  cartId: string,
-  productId: string,
-  count: number,
-) => {
-  const inv = await getInventoryFunctions();
+  return {
+    GET_USER_CART_ID: async () => await storage.getItem(userCartId),
+    getCartById,
+    cartCreate,
+    cartProductGetCount,
+    cartProductAdd: async (
+      cartId: string,
+      productId: string,
+      count: number,
+    ) => {
+      const inv = await getInventoryFunctions();
 
-  const cart = carts.get(cartId);
-  if (cart === undefined) return -1;
-  const productInventoryCount = inv.inventoryViewProductById(productId)?.count;
-  if (productInventoryCount === undefined) return -1;
-  const alreadyInCart = await cartProductGetCount(cartId, productId);
-  if (alreadyInCart < 0) return -1;
-  const newCount = alreadyInCart + count;
-  cart.products.set(productId, newCount);
-  return newCount;
-};
-
-export const cartView = (cartId: string) => carts.get(cartId);
-
-export const cartProductRemove = (cartId: string, productId: string) => {
-  const cart = carts.get(cartId);
-  if (cart === undefined) return false;
-  cart.products.delete(productId);
-  return true;
-};
-
-export const cartGetTotal = async (cartId: string) => {
-  const inv = await getInventoryFunctions();
-  const cart = carts.get(cartId);
-  if (cart === undefined) return 0;
-  return Array.from(cart.products.keys())
-    .map((productId) => {
-      const product = inv.inventoryViewProductById(productId)!;
-      const count = cart.products.get(productId)!;
-      return count * product.priceInCents;
-    })
-    .reduce((prev, curr) => prev + curr, 0);
+      const cart = getCartById(cartId);
+      if (cart === undefined) return -1;
+      const productInventoryCount =
+        inv.inventoryViewProductById(productId)?.count;
+      if (productInventoryCount === undefined) return -1;
+      const alreadyInCart = await cartProductGetCount(cartId, productId);
+      if (alreadyInCart < 0) return -1;
+      const newCount = alreadyInCart + count;
+      cart.products[productId] = newCount;
+      return newCount;
+    },
+    cartView: (cartId: string) => getCartById(cartId),
+    cartProductRemove: (cartId: string, productId: string) => {
+      const cart = getCartById(cartId);
+      if (cart === undefined) return false;
+      delete cart.products[productId];
+      return true;
+    },
+    cartGetTotal: async (cartId: string) => {
+      const inv = await getInventoryFunctions();
+      const cart = getCartById(cartId);
+      if (cart === undefined) return 0;
+      return Object.keys(cart.products)
+        .map((productId) => {
+          const product = inv.inventoryViewProductById(productId)!;
+          const count = cart.products[productId]!;
+          return count * product.priceInCents;
+        })
+        .reduce((prev, curr) => prev + curr, 0);
+    },
+  };
 };
 
 export interface Order {
@@ -185,21 +194,23 @@ const orders = global.orders as Map<string, Map<string, Order>>;
 
 export const orderCreateFromCart = async (cartId: string) => {
   const inv = await getInventoryFunctions();
-  const cart = carts.get(cartId);
+  const carts = await getCartFunctions();
+  const cart = carts.getCartById(cartId);
   if (cart === undefined) return false;
   if (cart.products.size <= 0) return false;
-  const orderTotal = await cartGetTotal(cartId);
+  const orderTotal = await carts.cartGetTotal(cartId);
   const orderId = uuid();
 
   // remove stock from inventory
-  cart.products.forEach((count, productId) => {
+  Object.keys(cart.products).forEach((productId) => {
     const product = inv.inventoryViewProductById(productId);
     if (product === undefined) return;
+    const count = cart.products[productId];
     product.count -= count;
   });
 
   // clear cart
-  cart.products.clear();
+  cart.products = {};
 
   // create orderMap for cart if not exists
   if (!orders.has(cartId)) {
