@@ -1,5 +1,4 @@
 import { getCartFunctions, getInventoryFunctions } from "@/app/api/model";
-import { storageGetFuncs } from "@/app/api/testNodePersist";
 
 interface CartView {
   products: {
@@ -14,10 +13,6 @@ interface CartView {
 }
 
 export async function GET(req: Request) {
-  const s = await storageGetFuncs();
-  await s.incrementCounter();
-  console.log(await s.getCounter());
-
   const inv = await getInventoryFunctions();
   const carts = await getCartFunctions();
 
