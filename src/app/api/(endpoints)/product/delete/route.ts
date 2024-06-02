@@ -1,4 +1,4 @@
-import { inventoryDeleteProductById } from "../../../model";
+import { getInventoryFunctions } from "../../../model";
 import { revalidatePath } from "next/cache";
 
 export async function DELETE(req: Request) {
@@ -6,7 +6,8 @@ export async function DELETE(req: Request) {
   if (productId === undefined) {
     return new Response(null, { status: 400 });
   }
-  const success = inventoryDeleteProductById(productId);
+  const inv = await getInventoryFunctions();
+  const success = await inv.inventoryDeleteProductById(productId);
   revalidatePath("/", "layout");
   return new Response(null, { status: success ? 200 : 400 });
 }

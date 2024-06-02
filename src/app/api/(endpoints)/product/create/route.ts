@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   if (!isValidNewProduct(newProduct)) {
     return new Response(null, { status: 400 });
   }
-  const newId = inv.inventoryCreateProduct(newProduct);
+  const newId = await inv.inventoryCreateProduct(newProduct);
   revalidatePath("/", "layout");
   return Response.json({ newProductId: newId });
 }

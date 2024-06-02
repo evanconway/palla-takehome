@@ -49,15 +49,17 @@ export const getInventoryFunctions = async () => {
     Object.values(inventory).map((p) => p as Product);
 
   return {
-    inventoryCreateProduct: (newProduct: NewProduct) => {
+    inventoryCreateProduct: async (newProduct: NewProduct) => {
       const newId = uuid();
       inventory[newId] = { id: newId, ...newProduct } as Product;
+      await storage.setItem(k, inventory);
       return newId;
     },
     inventoryAllValues,
-    inventoryDeleteProductById: (productId: string) => {
+    inventoryDeleteProductById: async (productId: string) => {
       const result = inventory[productId];
       delete inventory[productId];
+      await storage.setItem(k, inventory);
       return result;
     },
     inventoryView: (page = 0, search = "") => {
