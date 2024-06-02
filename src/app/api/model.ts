@@ -166,7 +166,7 @@ export const getCartFunctions = async () => {
       if (productInventoryCount === undefined) return -1;
       const alreadyInCart = await cartProductGetCount(cartId, productId);
       if (alreadyInCart < 0) return -1;
-      const newCount = alreadyInCart + count;
+      const newCount = Math.min(alreadyInCart + count, productInventoryCount);
       cart.products[productId] = newCount;
       await storage.setItem(k, carts);
       return newCount;

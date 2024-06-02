@@ -11,6 +11,6 @@ export async function POST(req: NextRequest) {
     count: number;
   };
   const newCount = await carts.cartProductAdd(cartId, productId, count);
-  revalidatePath("/", "layout");
+  revalidatePath("/cart");
   return Response.json({ productId, newCount });
 }
