@@ -1,49 +1,54 @@
-## Takehome Interview
+# Palla Takehome Interview
 
+```
 create a simple e-commerce web app that enables customers to browse available products, add them to their cart, see the total price, and "checkout", i.e. finalize their cart.
 
 please create an API that powers this experience. additionally, the API should allow for new products to be added to the site's inventory.
 
-we use nextjs <14 atm with xstate for handling state but as far as stack, feel free to use what is most comfortable for you -- and skip the database / 3rd party solutions and just store everything in memory...no need for authentication, styling or anything else not central to functionality.  
+we use nextjs <14 atm with xstate for handling state but as far as stack, feel free to use what is most comfortable for you -- and skip the database / 3rd party solutions and just store everything in memory...no need for authentication, styling or anything else not central to functionality.
 
 please use github or similar to host the repo, and please make the project easy for me to run on my machine.  dont worry about hosting or deploying.
-
-## Original Readme
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running The App
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To run this app, clone the repo to your machine. Make sure you have the latest version of Node installed. Navigate to the cloned directory and run:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+`npm i`
+`npm run dev`
 
-## Learn More
+You should now see a plain Browse Products page with no products. To seed with test data run:
 
-To learn more about Next.js, take a look at the following resources:
+`npm run seed`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Refresh the page and you should now see a paginated list of imaginary products. You made view these products, add them to your cart, and checkout to create orders totalling the sum of all items in your cart.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Add Product Endpoint
 
-## Deploy on Vercel
+You may also add products to the list. The endpoint is `<app domain>/api/product/create`. The request should use the post method and the body contents should contain the following fields:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| name         | type    |
+| ------------ | ------- |
+| name         | string  |
+| imageURL     | string  |
+| description  | string  |
+| priceInCents | integer |
+| count        | integer |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Here's an example fetch request in javascript to add a teapot to the product inventory:
 
+```javascript
+fetch("http://localhost:3000/api/product/create", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: "teapot",
+    imageURL:
+      "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQoVN3VFNeWGVpB4c1jcq52N7q3PVynIrkZByKdvY6u3s-A1Q7vWpPud-haMQz8ZtzTQj27_FPEjJk8x3U4r0xIqLD35-UMpfvmGpiAHIBtfIzA6aq0XJRDQ3w",
+    priceInCents: 10000,
+    count: 42,
+    description:
+      "A high quality teapot perfect for serving tea with friends and family.",
+  }),
+});
+```
