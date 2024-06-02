@@ -64,32 +64,39 @@ export default function Page({
       <div>{product.count} left in stock</div>
       <br />
       <div className="flex gap-4">
-        {itemIsInCart ? <div>Item already in cart</div> : null}
-        <button
-          onClick={async () => {
-            await fetch(`${domain}/api/cart/add`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                productId: product.id,
-                count: amountToPurchase,
-              }),
-            });
-            fetchItemIsInCart();
-          }}
-        >
-          Add To Cart
-        </button>
-        <input
-          className="text-black"
-          type="number"
-          min="1"
-          max={product.count}
-          value={amountToPurchase}
-          onChange={(e) => {
-            setAmountToPurchase(parseInt(e.target.value));
-          }}
-        ></input>
+        {itemIsInCart ? (
+          <div>
+            Item in cart. <Link href={`${domain}/cart`}>View Cart</Link>
+          </div>
+        ) : (
+          <div>
+            <button
+              onClick={async () => {
+                await fetch(`${domain}/api/cart/add`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    productId: product.id,
+                    count: amountToPurchase,
+                  }),
+                });
+                fetchItemIsInCart();
+              }}
+            >
+              Add To Cart
+            </button>
+            <input
+              className="text-black ml-4"
+              type="number"
+              min="1"
+              max={product.count}
+              value={amountToPurchase}
+              onChange={(e) => {
+                setAmountToPurchase(parseInt(e.target.value));
+              }}
+            ></input>
+          </div>
+        )}
       </div>
       <br />
       {backToBrowse}
