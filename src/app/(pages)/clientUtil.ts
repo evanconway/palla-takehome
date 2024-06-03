@@ -1,4 +1,11 @@
-export const centsToDollarString = (cents: number) => (cents / 100).toFixed(2);
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  currencyDisplay: "narrowSymbol",
+});
+
+export const centsToDollarString = (cents: number) =>
+  currencyFormatter.format(cents / 100);
 
 export interface CartView {
   products: {

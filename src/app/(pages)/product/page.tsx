@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/app/(pages)/clientUtil";
+import { Product, centsToDollarString } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -64,7 +64,7 @@ export default function Page({
     <main className="p-4">
       <h1>{product.name}</h1>
       <img src={product.imageURL}></img>
-      <div>${product.priceInCents / 100}</div>
+      <div>{centsToDollarString(product.priceInCents)}</div>
       <p>{product.description}</p>
       <div>{product.count} left in stock</div>
       <br />

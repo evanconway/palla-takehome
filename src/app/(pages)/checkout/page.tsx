@@ -1,6 +1,6 @@
 "use client";
 
-import { CartView } from "@/app/(pages)/clientUtil";
+import { CartView, centsToDollarString } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
@@ -32,7 +32,9 @@ export default function Page() {
     <main className="p-4">
       <div className="flex flex-col gap-8">
         <h1 className="text-xl">Checkout</h1>
-        <div className="text-xl">TOTAL: ${cartView.totalInCents / 100}</div>
+        <div className="text-xl">
+          TOTAL: {centsToDollarString(cartView.totalInCents)}
+        </div>
         {finalizing ? (
           <div>finalizing...</div>
         ) : (

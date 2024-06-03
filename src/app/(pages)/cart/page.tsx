@@ -1,6 +1,6 @@
 "use client";
 
-import { CartView } from "@/app/(pages)/clientUtil";
+import { CartView, centsToDollarString } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -32,9 +32,9 @@ export default function Page() {
               <li key={i} className="my-4">
                 <div>{product.name}</div>
                 <img src={product.imgURL}></img>
-                <div>${product.priceInCents / 100}</div>
+                <div>{centsToDollarString(product.priceInCents)}</div>
                 <div>count: {product.count}</div>
-                <div>{`Subtotal (${product.count} items): $${product.subTotalInCents / 100}`}</div>
+                <div>{`Subtotal (${product.count} items): ${centsToDollarString(product.subTotalInCents)}`}</div>
                 <button
                   onClick={async () => {
                     await fetch(`${domain}/api/cart/delete`, {
@@ -52,7 +52,9 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <div className="text-xl">TOTAL: ${cartView.totalInCents / 100}</div>
+          <div className="text-xl">
+            TOTAL: {centsToDollarString(cartView.totalInCents)}
+          </div>
           {cartView.products.length <= 0 ? null : (
             <Link className="text-xl" href={`${domain}/checkout`}>
               Checkout

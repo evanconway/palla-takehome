@@ -30,14 +30,16 @@ export default function Page() {
             const date = new Date(order.date);
             const hour = date.getHours();
             const displayHour = hour % 12 || 12;
-            const minute = date.getMinutes();
+            const minute = date.getMinutes().toLocaleString("en-US", {
+              minimumIntegerDigits: 2,
+            });
             const anteMeridiem = hour >= 13 ? "PM" : "AM";
 
             return (
               <li key={i} className="my-6">
                 <div>{`${date.toDateString()}`}</div>
                 <div>{`${displayHour}:${minute}${anteMeridiem}`}</div>
-                <div>${centsToDollarString(order.amountInCents)}</div>
+                <div>{centsToDollarString(order.amountInCents)}</div>
               </li>
             );
           })}

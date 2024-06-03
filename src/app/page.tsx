@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProductView } from "@/app/(pages)/clientUtil";
+import { ProductView, centsToDollarString } from "@/app/(pages)/clientUtil";
 import { domain } from "./util";
 
 export default async function Home({
@@ -51,7 +51,7 @@ export default async function Home({
             <li key={p.id} className="mb-4 ">
               <div>{p.name}</div>
               <img src={p.imageURL}></img>
-              <div>${p.priceInCents / 100}</div>
+              <div>{centsToDollarString(p.priceInCents)}</div>
               <Link href={`${domain}/product?id=${p.id}`}>View Product</Link>
             </li>
           ))}
