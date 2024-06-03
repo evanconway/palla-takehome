@@ -6,6 +6,6 @@ export async function POST() {
   const orders = await getOrderFunctions();
   const cartId = await carts.GET_USER_CART_ID(); // would be in a cookie or something in serious version
   const success = await orders.orderCreateFromCart(cartId);
-  revalidatePath("/orders");
+  revalidatePath("/", "layout");
   return Response.json({ success });
 }
