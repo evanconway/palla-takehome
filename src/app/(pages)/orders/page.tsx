@@ -1,15 +1,28 @@
+"use client";
+
 import { Order, centsToDollarString } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function Page() {
-  const data = await fetch(`${domain}/api/orders/view`);
-  const orders = (await data.json()) as Order[];
+export default function Page() {
+  const [orders, setOrders] = useState<Order[] | null>(null);
+
+  useEffect(() => {
+    const g = async () => {
+      const data = await fetch(`${domain}/api/orders/view`);
+      const ordersData = (await data.json()) as Order[];
+      setOrders(ordersData);
+    };
+    g();
+  }, [setOrders]);
 
   return (
     <main className="p-4">
       <h1 className="text-xl">Your Orders</h1>
-      {orders.length <= 0 ? (
+      {orders === null ? (
+        <div>loading...</div>
+      ) : orders.length <= 0 ? (
         <div>no orders</div>
       ) : (
         <ul className="mt-8">
