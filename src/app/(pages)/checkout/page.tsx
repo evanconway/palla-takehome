@@ -23,6 +23,8 @@ export default function Page() {
     fetchCart();
   }, [fetchCart]);
 
+  const [finalizing, setFinalizing] = useState(false);
+
   if (cartView === null) return <div>loading...</div>;
   if (cartView.products.length <= 0) redirect(`${domain}`);
 
@@ -31,18 +33,24 @@ export default function Page() {
       <div className="flex flex-col gap-8">
         <h1 className="text-xl">Checkout</h1>
         <div className="text-xl">TOTAL: ${cartView.totalInCents / 100}</div>
-        <div>
-          <button
-            onClick={async () => {
-              await fetch(`${domain}/api/orders/create`, {
-                method: "POST",
-              });
-              router.push(`${domain}/orders`);
-            }}
-          >
-            Finalize Purchase
-          </button>
-        </div>
+        {finalizing ? (
+          <div>finalizing...</div>
+        ) : (
+          <div>
+            <button
+              onClick={async () => {
+                setFinalizing(true);
+                await fetch(`${domain}/api/orders/create`, {
+                  method: "POST",
+                });
+                router.push(`${domain}/orders`);
+              }}
+            >
+              Finalize Purchase
+            </button>
+          </div>
+        )}
+
         <div>
           <Link href={`${domain}`}>No, go back to Browse Products</Link>
         </div>
