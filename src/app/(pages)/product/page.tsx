@@ -87,16 +87,21 @@ export default function Page({
             >
               Add To Cart
             </button>
-            <input
+            <select
               className="text-black ml-4"
-              type="number"
-              min="1"
-              max={product.count}
               value={amountToPurchase}
               onChange={(e) => {
-                setAmountToPurchase(parseInt(e.target.value));
+                const userValue = parseInt(e.target.value);
+                const value = Number.isNaN(userValue)
+                  ? 1
+                  : Math.max(userValue, 1);
+                setAmountToPurchase(Math.min(product.count, value));
               }}
-            ></input>
+            >
+              {new Array(product.count).fill(0).map((_, i) => (
+                <option value={i + 1}>{i + 1}</option>
+              ))}
+            </select>
           </div>
         )}
       </div>
