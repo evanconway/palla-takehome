@@ -4,6 +4,7 @@ import { CartView, centsToDollarString } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import ProductImage from "../ProductImage";
 
 export default function Page() {
   const [cartView, setCartView] = useState<CartView | null>(null);
@@ -31,7 +32,7 @@ export default function Page() {
             {cartView.products.map((product, i) => (
               <li key={i} className="my-4">
                 <div>{product.name}</div>
-                <img src={product.imgURL}></img>
+                <ProductImage imgURL={product.imgURL}></ProductImage>
                 <div>{centsToDollarString(product.priceInCents)}</div>
                 <div>count: {product.count}</div>
                 <div>{`Subtotal (${product.count} items): ${centsToDollarString(product.subTotalInCents)}`}</div>

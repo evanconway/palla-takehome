@@ -23,7 +23,7 @@ export interface Product {
   id: string;
   count: number;
   name: string;
-  imageURL: string;
+  imageURL?: string;
   description: string;
   priceInCents: number;
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ProductView, centsToDollarString } from "@/app/(pages)/clientUtil";
 import { domain } from "./util";
+import ProductImage from "./(pages)/ProductImage";
 
 export default async function Home({
   searchParams,
@@ -50,7 +51,7 @@ export default async function Home({
           {products.map((p) => (
             <li key={p.id} className="mb-4 ">
               <div>{p.name}</div>
-              <img src={p.imageURL}></img>
+              <ProductImage imgURL={p.imageURL}></ProductImage>
               <div>{centsToDollarString(p.priceInCents)}</div>
               <Link href={`${domain}/product?id=${p.id}`}>View Product</Link>
             </li>

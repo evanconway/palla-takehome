@@ -5,6 +5,7 @@ import { domain } from "@/app/util";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import ProductImage from "../ProductImage";
 
 export default function Page({
   searchParams,
@@ -63,7 +64,7 @@ export default function Page({
   return (
     <main className="p-4">
       <h1>{product.name}</h1>
-      <img src={product.imageURL}></img>
+      <ProductImage imgURL={product.imageURL}></ProductImage>
       <div>{centsToDollarString(product.priceInCents)}</div>
       <p>{product.description}</p>
       <div>{product.count} left in stock</div>
@@ -103,7 +104,9 @@ export default function Page({
               }}
             >
               {new Array(product.count).fill(0).map((_, i) => (
-                <option value={i + 1}>{i + 1}</option>
+                <option key={i} value={i + 1}>
+                  {i + 1}
+                </option>
               ))}
             </select>
           </div>

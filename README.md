@@ -28,13 +28,13 @@ Refresh the page and you should now see a paginated list of imaginary products. 
 
 You may also add products to the list. The endpoint is `/api/product/create`. The request should use the post method and the body contents should contain the following fields:
 
-| name         | type    |
-| ------------ | ------- |
-| name         | string  |
-| imageURL     | string  |
-| description  | string  |
-| priceInCents | integer |
-| count        | integer |
+| name         | type              |
+| ------------ | ----------------- |
+| name         | string            |
+| imageURL     | string (optional) |
+| description  | string            |
+| priceInCents | integer           |
+| count        | integer           |
 
 Here's an example fetch request in javascript to add a teapot to the product inventory:
 

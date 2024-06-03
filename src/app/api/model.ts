@@ -3,7 +3,7 @@ import storage from "node-persist";
 
 export interface NewProduct {
   name: string;
-  imageURL: string;
+  imageURL?: string;
   description: string;
   priceInCents: number;
   count: number;
@@ -11,7 +11,7 @@ export interface NewProduct {
 
 export const isValidNewProduct = (possibleProduct: any) => {
   if (possibleProduct["name"] === undefined) return false;
-  if (possibleProduct["imageURL"] === undefined) return false;
+  // if (possibleProduct["imageURL"] === undefined) return false;
   if (possibleProduct["description"] === undefined) return false;
   if (possibleProduct["priceInCents"] === undefined) return false;
   if (possibleProduct["count"] === undefined || possibleProduct["count"] < 0)
