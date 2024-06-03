@@ -53,3 +53,11 @@ fetch("http://localhost:3000/api/product/create", {
   }),
 });
 ```
+
+## Additional Information
+
+All environment variables for the app are hardcoded in. There is no need to create an .env or any additional files.
+
+If you want to reset the database, shutdown the app, delete the `.node-persist` file in the root directory, and restart the app.
+
+### Thank You!
