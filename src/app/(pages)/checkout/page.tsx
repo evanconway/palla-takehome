@@ -50,9 +50,11 @@ export default function Page() {
             </button>
           </div>
         )}
-
         <div>
-          <Link href={`${domain}`}>No, go back to Browse Products</Link>
+          <Link href={`${domain}/cart`}>Go back to Cart</Link>
+        </div>
+        <div>
+          <Link href={`${domain}`}>Go back to Browse Products</Link>
         </div>
       </div>
     </main>

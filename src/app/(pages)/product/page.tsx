@@ -3,6 +3,7 @@
 import { Product } from "@/app/(pages)/clientUtil";
 import { domain } from "@/app/util";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Page({
@@ -10,6 +11,8 @@ export default function Page({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
+  const router = useRouter();
+
   const productId =
     searchParams && typeof searchParams["id"] === "string"
       ? searchParams["id"]
@@ -82,6 +85,7 @@ export default function Page({
                     count: amountToPurchase,
                   }),
                 });
+                router.push(`${domain}/cart`);
                 fetchItemIsInCart();
               }}
             >
