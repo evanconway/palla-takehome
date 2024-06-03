@@ -26,7 +26,7 @@ Refresh the page and you should now see a paginated list of imaginary products. 
 
 ## Add Product Endpoint
 
-You may also add products to the list. The endpoint is `/api/product/create`. The request should use the post method and the body contents should contain the following fields:
+You may also add products to the list. The endpoint is `/api/product/create`. The request method is POST and the body contains the following fields:
 
 | name         | type              |
 | ------------ | ----------------- |
