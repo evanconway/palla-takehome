@@ -18,7 +18,7 @@ Clone the repo to your machine. Make sure you have the latest version of Node in
 
 `npm run dev`
 
-Once you see the "Ready" message in your terminal, open a browser and go to [](http://localhost:3000/) You should now see a plain Browse Products page with no products. To seed with test data run:
+Once you see the "Ready" message in your terminal, open a browser and go to [http://localhost:3000/](http://localhost:3000/) You should now see a plain Browse Products page with no products. To seed with test data run:
 
 `npm run seed`
 
