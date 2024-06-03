@@ -15,6 +15,7 @@ please use github or similar to host the repo, and please make the project easy 
 Clone the repo to your machine. Make sure you have the latest version of Node installed. Make sure you have no other applications running on port 3000. Navigate to the cloned directory and run:
 
 `npm i`
+
 `npm run dev`
 
 Open a browser and go to `http://localhost:3000/` You should now see a plain Browse Products page with no products. To seed with test data run:
